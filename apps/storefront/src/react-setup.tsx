@@ -34,7 +34,7 @@ ReactDOM.createRoot(container).render(
             <B3StoreContainer>
               <DynamicallyVariableProvider>
                 <B3ThemeProvider>
-                  <App />
+                  <App isEmbedded={container.dataset.embedded ?? false} />
                 </B3ThemeProvider>
               </DynamicallyVariableProvider>
             </B3StoreContainer>

@@ -12,12 +12,15 @@
   position: fixed;
   overscroll-behavior: contain;
   z-index: var(--z-index-IFRAME);
-  pointer-events: pointer;
+}
+
+#bundle-container[data-embedded] iframe {
+  position: static;
+  height: 100vh;
 }
 
 .bundle-namespace iframe {
-  font-family: 'Helvetica Neue', 'Apple Color Emoji', Helvetica, Arial,
-    sans-serif;
+  font-family: 'Helvetica Neue', 'Apple Color Emoji', Helvetica, Arial, sans-serif;
   font-size: 100%;
   font-style: normal;
   letter-spacing: normal;

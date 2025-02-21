@@ -3,9 +3,10 @@ import { Box, Typography } from '@mui/material';
 
 interface LoadingProps {
   backColor?: string;
+  isEmbedded?: boolean;
 }
 
-function Loading({ backColor }: LoadingProps) {
+function Loading({ backColor, isEmbedded = false }: LoadingProps) {
   const b3Lang = useB3Lang();
 
   return (
@@ -13,7 +14,7 @@ function Loading({ backColor }: LoadingProps) {
       sx={{
         width: '100%',
         height: '100%',
-        position: 'fixed',
+        position: isEmbedded ? 'fixed' : 'static',
         top: 0,
         left: 0,
         backgroundColor: backColor || 'background.default',

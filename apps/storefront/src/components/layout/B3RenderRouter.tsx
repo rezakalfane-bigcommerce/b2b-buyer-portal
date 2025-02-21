@@ -18,11 +18,16 @@ const B3LayoutTip = lazy(() => import('@/components/layout/B3LayoutTip'));
 interface B3RenderRouterProps {
   setOpenPage: SetOpenPage;
   openUrl?: string;
+  isEmbedded: boolean;
   isOpen: boolean;
 }
 
-export default function B3RenderRouter(props: B3RenderRouterProps) {
-  const { setOpenPage, openUrl, isOpen } = props;
+export default function B3RenderRouter({
+  setOpenPage,
+  openUrl,
+  isOpen,
+  isEmbedded,
+}: B3RenderRouterProps) {
   const { state: globalState } = useContext(GlobalContext);
   const newRoutes = () => getAllowedRoutes(globalState);
   const location = useLocation();
@@ -64,13 +69,13 @@ export default function B3RenderRouter(props: B3RenderRouterProps) {
   );
 
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<Loading isEmbedded={isEmbedded} />}>
       <B3LayoutTip />
       <Routes>
         <Route
           // path="/"
           element={
-            <B3Layout>
+            <B3Layout isEmbedded={isEmbedded}>
               <Outlet />
             </B3Layout>
           }

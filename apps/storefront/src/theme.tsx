@@ -39,10 +39,10 @@ function B3ThemeProvider({ children }: Props) {
       {
         palette: {
           background: {
-            default: backgroundColor,
+            default: '#ffffff', // backgroundColor,
           },
           primary: {
-            main: primaryColor || '#1976d2',
+            main: '#000000',
           },
         },
       },

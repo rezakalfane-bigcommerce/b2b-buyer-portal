@@ -56,7 +56,11 @@ const ThemeFrame = lazy(() => import('@/components/ThemeFrame'));
 
 const FONT_URL = 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap';
 
-export default function App() {
+interface Props {
+  isEmbedded: boolean;
+}
+
+export default function App({ isEmbedded }: Props) {
   const showPageMask = usePageMask();
   const {
     state: { quoteConfig, storefrontConfig, productQuoteEnabled, registerEnabled },
@@ -118,7 +122,7 @@ export default function App() {
   useDomHooks({ setOpenPage, isOpen });
 
   // open storefront
-  useSetOpen(isOpen, openUrl, params);
+  useSetOpen(isOpen, isEmbedded, params);
 
   const { pathname, href, search } = window.location;
 
@@ -367,7 +371,12 @@ export default function App() {
             customStyles={customStyles}
           >
             {isOpen ? (
-              <B3RenderRouter isOpen={isOpen} openUrl={openUrl} setOpenPage={setOpenPage} />
+              <B3RenderRouter
+                isEmbedded={isEmbedded}
+                isOpen={isOpen}
+                openUrl={openUrl}
+                setOpenPage={setOpenPage}
+              />
             ) : null}
           </ThemeFrame>
         </div>

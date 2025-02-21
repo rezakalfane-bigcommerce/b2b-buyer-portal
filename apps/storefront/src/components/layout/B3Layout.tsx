@@ -23,7 +23,12 @@ const SPECIAL_PATH_TEXTS = {
   '/company-orders': 'global.companyOrders.title',
 } as const;
 
-export default function B3Layout({ children }: { children: ReactNode }) {
+interface Props {
+  children: ReactNode;
+  isEmbedded: boolean;
+}
+
+export default function B3Layout({ children, isEmbedded }: Props) {
   const [isMobile] = useMobile();
   const isDesktopLimit = useMediaQuery('(min-width:1775px)');
 
@@ -120,7 +125,7 @@ export default function B3Layout({ children }: { children: ReactNode }) {
             p: '32px 63px 70px 63px',
           }}
         >
-          <B3CloseAppButton />
+          {!isEmbedded && <B3CloseAppButton />}
           <Box
             sx={{
               display: 'flex',
@@ -129,10 +134,10 @@ export default function B3Layout({ children }: { children: ReactNode }) {
               displayPrint: 'none',
             }}
           >
-            <B3Logo />
+            {!isEmbedded && <B3Logo />}
             <Box
               sx={{
-                pt: '24px',
+                pt: !isEmbedded ? '24px' : 0,
               }}
             >
               <B3Nav />
@@ -150,7 +155,7 @@ export default function B3Layout({ children }: { children: ReactNode }) {
               ...overflowStyle,
             }}
           >
-            <B3MainHeader title={title} />
+            {!isEmbedded && <B3MainHeader title={title} />}
             <CompanyCredit />
             <Box
               component="main"
