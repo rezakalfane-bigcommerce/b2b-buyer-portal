@@ -1,4 +1,4 @@
-import { getB2BAccountFormFields, getB2BAddressExtraFields } from '@/shared/service/b2b';
+import { getB2BAddressExtraFields, getPersonalFormFields } from '@/shared/service/b2b';
 import b2bLogger from '@/utils/b3Logger';
 
 import {
@@ -71,7 +71,7 @@ const convertExtraFields = (extraFields: B2bExtraFieldsProps[]): [] | ExtraField
 
 const getBcAddressFields = async () => {
   try {
-    const { accountFormFields } = await getB2BAccountFormFields(1);
+    const accountFormFields = await getPersonalFormFields();
 
     const addressFields = accountFormFields.filter(
       (field: AccountFormFieldsItems) => field.groupId === 4,
@@ -98,7 +98,7 @@ const getB2BAddressFields = async () => {
   return [];
 };
 
-export const getAddressFields = async (isB2BUser: boolean, countries: CountryProps) => {
+export const getAddressFields = async (isB2BUser: boolean, countries: CountryProps[]) => {
   let allAddressFields: CustomFieldItems[] = [];
 
   try {

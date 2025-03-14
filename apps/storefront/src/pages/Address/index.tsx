@@ -86,7 +86,7 @@ function Address() {
 
   useEffect(() => {
     const handleGetAddressFields = async () => {
-      const { countries } = await getB2BCountries();
+      const countries = await getB2BCountries();
 
       setCountries(countries);
       setIsRequestLoading(true);

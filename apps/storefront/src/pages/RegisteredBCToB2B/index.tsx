@@ -13,19 +13,19 @@ import B3Spin from '@/components/spin/B3Spin';
 import { useMobile } from '@/hooks';
 import { CustomStyleContext } from '@/shared/customStyleButton';
 import { GlobalContext } from '@/shared/global';
+import {
+  createB2BCompanyUser,
+  getAllFormFields,
+  getB2BCountries,
+  uploadB2BFile,
+  validateBCCompanyExtraFields,
+  validateBCCompanyUserExtraFields,
+} from '@/shared/service/b2b';
 import { useAppSelector } from '@/store';
 import { channelId, loginJump, storeHash } from '@/utils';
 import b2bLogger from '@/utils/b3Logger';
 import { getCurrentCustomerInfo } from '@/utils/loginInfo';
 
-import {
-  createB2BCompanyUser,
-  getB2BAccountFormFields,
-  getB2BCountries,
-  uploadB2BFile,
-  validateBCCompanyExtraFields,
-  validateBCCompanyUserExtraFields,
-} from '../../shared/service/b2b';
 import { type PageProps } from '../PageProps';
 import {
   AccountFormFieldsItems,
@@ -138,22 +138,22 @@ export default function RegisteredBCToB2B(props: PageProps) {
           });
         }
 
-        const accountFormAllFields = await getB2BAccountFormFields(3);
+        const accountFormAllFields = await getAllFormFields();
 
-        const newAccountFormFields: AccountFormFieldsItems[] = (
-          accountFormAllFields?.accountFormFields || []
-        ).map((fields: AccountFormFieldsItems) => {
-          const accountFields = fields;
-          if (b2bAddressRequiredFields.includes(fields?.fieldId || '') && fields.groupId === 4) {
-            accountFields.isRequired = true;
-            accountFields.visible = true;
-          }
+        const newAccountFormFields: AccountFormFieldsItems[] = accountFormAllFields.map(
+          (fields: AccountFormFieldsItems) => {
+            const accountFields = fields;
+            if (b2bAddressRequiredFields.includes(fields?.fieldId || '') && fields.groupId === 4) {
+              accountFields.isRequired = true;
+              accountFields.visible = true;
+            }
 
-          return fields;
-        });
+            return fields;
+          },
+        );
 
         const bcToB2BAccountFormFields = getAccountFormFields(newAccountFormFields || []);
-        const { countries } = await getB2BCountries();
+        const countries = await getB2BCountries();
 
         const newAddressInformationFields = bcToB2BAccountFormFields.address.map(
           (addressFields: Partial<RegisterFieldsItems>): Partial<RegisterFieldsItems> => {

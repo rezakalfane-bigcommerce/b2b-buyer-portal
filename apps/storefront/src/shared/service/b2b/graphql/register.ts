@@ -262,10 +262,22 @@ const customerSubscribersCreate = `mutation customerSubscribersCreate($subscribe
 }
 `;
 
-export const getB2BAccountFormFields = (type: number) =>
+const getB2BAccountFormFields = (type: number): Promise<Array<any>> =>
   B3Request.graphqlB2B({
     query: getAccountFormFields(type),
-  });
+  }).then((res) => res.accountFormFields);
+
+export const getPersonalFormFields = () => {
+  return getB2BAccountFormFields(1);
+};
+
+export const getBusinessFormFields = () => {
+  return getB2BAccountFormFields(2);
+};
+
+export const getAllFormFields = () => {
+  return getB2BAccountFormFields(3);
+};
 
 export const getB2BCompanyUserInfo = () =>
   B3Request.graphqlB2B({
@@ -282,10 +294,10 @@ export const getB2BRegisterCustomFields = () =>
     query: getCompanyExtraFields(),
   });
 
-export const getB2BCountries = () =>
+export const getB2BCountries = (): Promise<any[]> =>
   B3Request.graphqlB2B({
     query: getCountries(),
-  });
+  }).then((res) => res.countries);
 
 export const createB2BCompanyUser = (data: CustomFieldItems) =>
   B3Request.graphqlB2B({

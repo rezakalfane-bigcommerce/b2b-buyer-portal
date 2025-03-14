@@ -8,7 +8,11 @@ import B3Spin from '@/components/spin/B3Spin';
 import { useMobile, useScrollBar } from '@/hooks';
 import { CustomStyleContext } from '@/shared/customStyleButton';
 import { GlobalContext } from '@/shared/global';
-import { getB2BAccountFormFields, getB2BCountries } from '@/shared/service/b2b';
+import {
+  getB2BCountries,
+  getBusinessFormFields,
+  getPersonalFormFields,
+} from '@/shared/service/b2b';
 import { bcLogin } from '@/shared/service/bc';
 import { themeFrameSelector, useAppSelector } from '@/store';
 import { B3SStorage, loginJump } from '@/utils';
@@ -30,9 +34,6 @@ import RegisterContent from './RegisterContent';
 import RegisteredStep from './RegisteredStep';
 import { RegisteredContainer, RegisteredImage } from './styled';
 import { RegisterFields } from './types';
-
-// 1 bc 2 b2b
-const formType: Array<number> = [1, 2];
 
 function Registered(props: PageProps) {
   const { setOpenPage } = props;
@@ -93,36 +94,32 @@ function Registered(props: PageProps) {
           });
         }
 
-        const accountFormAllFields = formType.map((item: number) => getB2BAccountFormFields(item));
+        const [personalFormFields, businessFormFields, countries] = await Promise.all([
+          getPersonalFormFields().then(getAccountFormFields),
+          getBusinessFormFields()
+            .then((fields) =>
+              fields.map((field: AccountFormFieldsItems) => {
+                if (
+                  b2bAddressRequiredFields.includes(field?.fieldId || '') &&
+                  field.groupId === 4
+                ) {
+                  field.isRequired = true;
+                  field.visible = true;
+                }
 
-        const accountFormFields = await Promise.all(accountFormAllFields);
-
-        const newB2bAccountFormFields: AccountFormFieldsItems[] = (
-          accountFormFields[1]?.accountFormFields || []
-        ).map((fields: AccountFormFieldsItems) => {
-          const formFields = fields;
-          if (b2bAddressRequiredFields.includes(fields?.fieldId || '') && fields.groupId === 4) {
-            formFields.isRequired = true;
-            formFields.visible = true;
-          }
-
-          return fields;
-        });
-
-        const bcAccountFormFields = getAccountFormFields(
-          accountFormFields[0]?.accountFormFields || [],
-        );
-        const b2bAccountFormFields = getAccountFormFields(newB2bAccountFormFields || []);
-
-        const { countries } = await getB2BCountries();
+                return field;
+              }),
+            )
+            .then(getAccountFormFields),
+          getB2BCountries(),
+        ]);
 
         const newAddressInformationFields =
-          b2bAccountFormFields.address?.map(
+          businessFormFields.address?.map(
             (addressFields: Partial<RegisterFieldsItems>): Partial<RegisterFieldsItems> => {
-              const fields = addressFields;
               if (addressFields.name === 'country') {
-                fields.options = countries;
-                fields.replaceOptions = {
+                addressFields.options = countries;
+                addressFields.replaceOptions = {
                   label: 'countryName',
                   value: 'countryName',
                 };
@@ -132,7 +129,7 @@ function Registered(props: PageProps) {
           ) || [];
 
         const newBCAddressInformationFields =
-          bcAccountFormFields.address?.map(
+          personalFormFields.address?.map(
             (addressFields: Partial<RegisterFieldsItems>): Partial<RegisterFieldsItems> => {
               const addressFormFields = addressFields;
               if (addressFields.name === 'country') {
@@ -149,6 +146,7 @@ function Registered(props: PageProps) {
         // accountLoginRegistration
         const { b2b, b2c } = accountLoginRegistration;
         const accountB2cEnabledInfo = b2c && !b2b;
+
         if (dispatch) {
           dispatch({
             type: 'all',
@@ -157,20 +155,20 @@ function Registered(props: PageProps) {
               isLoading: false,
               storeName,
               // account
-              contactInformation: [...(b2bAccountFormFields.contactInformation || [])],
-              bcContactInformation: [...(bcAccountFormFields.contactInformation || [])],
-              additionalInformation: [...(b2bAccountFormFields.additionalInformation || [])],
-              bcAdditionalInformation: [...(bcAccountFormFields.additionalInformation || [])],
+              contactInformation: [...(businessFormFields.contactInformation || [])],
+              bcContactInformation: [...(personalFormFields.contactInformation || [])],
+              additionalInformation: [...(businessFormFields.additionalInformation || [])],
+              bcAdditionalInformation: [...(personalFormFields.additionalInformation || [])],
               // detail
               companyExtraFields: [],
-              companyInformation: [...(b2bAccountFormFields?.businessDetails || [])],
+              companyInformation: [...(businessFormFields?.businessDetails || [])],
               companyAttachment: [...companyAttachmentsFields(b3Lang)],
               addressBasicFields: [...newAddressInformationFields],
               bcAddressBasicFields: [...newBCAddressInformationFields],
               countryList: [...countries],
               // password
-              passwordInformation: [...(b2bAccountFormFields.password || [])],
-              bcPasswordInformation: [...(bcAccountFormFields.password || [])],
+              passwordInformation: [...(businessFormFields.password || [])],
+              bcPasswordInformation: [...(personalFormFields.password || [])],
             },
           });
         }

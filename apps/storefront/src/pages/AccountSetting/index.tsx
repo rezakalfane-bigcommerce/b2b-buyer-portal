@@ -15,9 +15,10 @@ import { CustomStyleContext } from '@/shared/customStyleButton';
 import {
   checkUserBCEmail,
   checkUserEmail,
-  getB2BAccountFormFields,
   getB2BAccountSettings,
   getBCAccountSettings,
+  getBusinessFormFields,
+  getPersonalFormFields,
   updateB2BAccountSettings,
   updateBCAccountSettings,
 } from '@/shared/service/b2b';
@@ -128,10 +129,10 @@ function AccountSetting() {
 
         const key = isBCUser ? 'customerAccountSettings' : 'accountSettings';
 
-        const accountFormAllFields = await getB2BAccountFormFields(isBCUser ? 1 : 2);
-        const accountFormFields = getAccountFormFields(
-          accountFormAllFields.accountFormFields || [],
-        );
+        const accountFormAllFields = isBCUser
+          ? await getPersonalFormFields()
+          : await getBusinessFormFields();
+        const accountFormFields = getAccountFormFields(accountFormAllFields);
 
         const contactInformation = (accountFormFields?.contactInformation || []).filter(
           (item: Partial<Fields>) => item.fieldId !== 'field_email_marketing_newsletter',

@@ -14,7 +14,7 @@ const useSetCountry = () => {
   useEffect(() => {
     const init = async () => {
       if (countriesList && !countriesList.length) {
-        const { countries } = await getB2BCountries();
+        const countries = await getB2BCountries();
 
         dispatch({
           type: 'common',

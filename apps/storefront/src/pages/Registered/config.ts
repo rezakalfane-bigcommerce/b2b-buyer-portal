@@ -400,7 +400,7 @@ export interface Country {
   countryCode: string;
   countryName: string;
   id?: string;
-  states: [];
+  states: State[];
 }
 export interface State {
   stateCode?: string;
