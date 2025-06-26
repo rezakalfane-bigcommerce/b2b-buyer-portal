@@ -1,15 +1,10 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useB3Lang } from '@b3/lang';
 import { Box, Stack } from '@mui/material';
 import trim from 'lodash-es/trim';
-
-import { B3CustomForm } from '@/components';
 import CustomButton from '@/components/button/CustomButton';
-import { b3HexToRgb, getContrastColor } from '@/components/outSideComponents/utils/b3CustomStyles';
 import B3Spin from '@/components/spin/B3Spin';
-import { useMobile } from '@/hooks';
 import useStorageState from '@/hooks/useStorageState';
 import { CustomStyleContext } from '@/shared/customStyleButton';
 import {
@@ -18,19 +13,14 @@ import {
   getB2BAccountFormFields,
   getB2BAccountSettings,
   getBCAccountSettings,
-  updateB2BAccountSettings,
-  updateBCAccountSettings,
 } from '@/shared/service/b2b';
 import { isB2BUserSelector, useAppSelector } from '@/store';
 import { Fields, ParamProps } from '@/types/accountSetting';
-import { B3SStorage, channelId, snackbar } from '@/utils';
-
-import { deCodeField, getAccountFormFields } from '../Registered/config';
-
+import { channelId, snackbar } from '@/utils';
+import { getAccountFormFields } from '../Registered/config';
 import { getAccountSettingsFields, getPasswordModifiedFields } from './config';
-import { b2bSubmitDataProcessing, bcSubmitDataProcessing, initB2BInfo, initBcInfo } from './utils';
+import { initB2BInfo, initBcInfo } from './utils';
 import B3Request from '@/shared/service/request/b3Fetch';
-import { RequestType } from '@/shared/service/request/base';
 
 function useData() {
   const isB2BUser = useAppSelector(isB2BUserSelector);
@@ -76,19 +66,8 @@ function useData() {
 }
 
 function AccountSetting() {
-  const { isBCUser, companyId, customer, validateEmailValue, emailValidation, passwordValidation } =
+  const { isBCUser, companyId } =
     useData();
-
-  const {
-    control,
-    handleSubmit,
-    getValues,
-    formState: { errors },
-    setValue,
-    setError,
-  } = useForm({
-    mode: 'onSubmit',
-  });
 
   const [isFinishUpdate, setIsFinishUpdate] = useStorageState<boolean>(
     'sf-isFinishUpdate',
@@ -103,16 +82,9 @@ function AccountSetting() {
   } = useContext(CustomStyleContext);
 
   const b3Lang = useB3Lang();
-
-  const [isMobile] = useMobile();
-
   const navigate = useNavigate();
 
-  const [accountInfoFormFields, setAccountInfoFormFields] = useState<Partial<Fields>[]>([]);
-  const [decryptionFields, setDecryptionFields] = useState<Partial<Fields>[]>([]);
-  const [extraFields, setExtraFields] = useState<Partial<Fields>[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [accountSettings, setAccountSettings] = useState<any>({});
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [salesStaff, setSalesStaff] = useState<any[]>([]);
 
@@ -137,10 +109,7 @@ function AccountSetting() {
         const all = [...fields, ...passwordModifiedFields];
         const roleItem = all.find((item) => item.name === 'role');
         if (roleItem?.fieldType) roleItem.fieldType = 'text';
-        setAccountInfoFormFields(all);
-        setAccountSettings(accountSettings);
-        setDecryptionFields(contactInformation);
-        setExtraFields(additionalInformation);
+
         // --- NEW: Fetch sales staff
         const { data: salesList = [] } = await B3Request.get(`/api/v3/io/sales-staffs`, "B2BEditionRest", { companyId });
         if (salesList.length > 0) {
@@ -165,112 +134,6 @@ function AccountSetting() {
     // disabling as we only need to run this once and values at starting render are good enough
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleGetUserExtraFields = (
-    data: CustomFieldItems,
-    accountInfoFormFields: Partial<Fields>[],
-  ) => {
-    const userExtraFields = accountInfoFormFields.filter(
-      (item: CustomFieldItems) => item.custom && item.groupId === 1,
-    );
-    return userExtraFields.map((item: CustomFieldItems) => ({
-      fieldName: deCodeField(item?.name || ''),
-      fieldValue: data[item.name],
-    }));
-  };
-
-  const handleAddUserClick = () => {
-    handleSubmit(async (data: CustomFieldItems) => {
-      setLoading(true);
-
-      try {
-        const isValid = await validateEmailValue(data.email);
-
-        if (!isValid) {
-          setError('email', {
-            type: 'custom',
-            message: b3Lang('accountSettings.notification.emailExists'),
-          });
-        }
-
-        const emailFlag = emailValidation(data);
-
-        if (!emailFlag) {
-          snackbar.error(b3Lang('accountSettings.notification.updateEmailPassword'));
-        }
-
-        const passwordFlag = passwordValidation(data);
-
-        if (!passwordFlag) {
-          setError('confirmPassword', {
-            type: 'manual',
-            message: b3Lang('global.registerComplete.passwordMatchPrompt'),
-          });
-          setError('password', {
-            type: 'manual',
-            message: b3Lang('global.registerComplete.passwordMatchPrompt'),
-          });
-        }
-
-        if (isValid && emailFlag && passwordFlag) {
-          const dataProcessingFn = isBCUser ? bcSubmitDataProcessing : b2bSubmitDataProcessing;
-          const payload = dataProcessingFn(data, accountSettings, decryptionFields, extraFields);
-
-          if (payload) {
-            if (!isBCUser) {
-              payload.companyId = companyId;
-              payload.extraFields = handleGetUserExtraFields(data, accountInfoFormFields);
-            }
-
-            if (payload.newPassword === '' && payload.confirmPassword === '') {
-              delete payload.newPassword;
-              delete payload.confirmPassword;
-            }
-          }
-
-          if (!payload) {
-            snackbar.success(b3Lang('accountSettings.notification.noEdits'));
-            return;
-          }
-
-          const requestFn = isBCUser ? updateBCAccountSettings : updateB2BAccountSettings;
-          await requestFn(payload);
-
-          if (
-            (data.password && data.currentPassword) ||
-            customer.emailAddress !== trim(data.email)
-          ) {
-            navigate('/login?loginFlag=loggedOutLogin');
-          } else {
-            B3SStorage.clear();
-            setIsFinishUpdate(true);
-            window.location.reload();
-          }
-        }
-      } finally {
-        setLoading(false);
-      }
-    })();
-  };
-
-  const translatedFields = useMemo(() => {
-    const fieldTranslations: Record<string, string> = {
-      field_first_name: b3Lang('accountSettings.form.firstName'),
-      field_last_name: b3Lang('accountSettings.form.lastName'),
-      field_email: b3Lang('accountSettings.form.email'),
-      field_phone_number: b3Lang('accountSettings.form.phoneNumber'),
-      field_company: b3Lang('accountSettings.form.company'),
-      field_role: b3Lang('accountSettings.form.role'),
-      field_current_password: b3Lang('accountSettings.form.currentPassword'),
-      field_password: b3Lang('accountSettings.form.password'),
-      field_confirm_password: b3Lang('accountSettings.form.confirmPassword'),
-    };
-
-    return accountInfoFormFields.map((item) => ({
-      ...item,
-      label: fieldTranslations[item.fieldId ?? ''] ?? item.label,
-    }));
-  }, [accountInfoFormFields, b3Lang]);
 
   return (
     <B3Spin isSpinning={isLoading} background={backgroundColor}>
