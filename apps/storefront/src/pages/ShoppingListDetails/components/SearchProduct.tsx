@@ -183,7 +183,7 @@ export default function SearchProduct({
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon />
+              <SearchIcon sx={{w: '32px'}}/>
             </InputAdornment>
           ),
         }}

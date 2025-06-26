@@ -68,9 +68,10 @@ function B3FilterSearch({
     >
       <SearchIcon
         sx={{
-          p: '10px',
-          color: 'rgba(0, 0, 0, 0.54)',
-          fontSize: '2.7rem',
+          // w: '32px',
+          // p: '10px',
+          // color: 'rgba(0, 0, 0, 0.54)',
+          // fontSize: '2.7rem',
         }}
       />
       <InputBase
@@ -89,15 +90,15 @@ function B3FilterSearch({
           search.length > 0 && (
             <ClearIcon
               sx={{
-                marginRight: '8px',
-                cursor: 'pointer',
-                padding: '4px',
-                fontSize: '1.8rem',
-                color: 'rgba(0, 0, 0, 0.54)',
-                ':hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                  borderRadius: '48px',
-                },
+                // marginRight: '8px',
+                // cursor: 'pointer',
+                // padding: '4px',
+                // fontSize: '1.8rem',
+                // color: 'rgba(0, 0, 0, 0.54)',
+                // ':hover': {
+                  // backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  // borderRadius: '48px',
+                // },
               }}
               onClick={handleClearSearchValue}
             />

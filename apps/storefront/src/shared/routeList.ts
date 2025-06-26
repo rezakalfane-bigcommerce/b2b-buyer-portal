@@ -235,6 +235,16 @@ export const routeList: (BuyerPortalRoute | RouteItem)[] = [
     isTokenLogin: false,
     idLang: 'global.navMenu.quoteDetail',
   },
+  {
+    path: '/salesRep',
+    name: 'Sales Representativ',
+    wsKey: 'salesRep',
+    isMenuItem: true,
+    configKey: 'salesRep',
+    permissions: accountSettingPermissions,
+    isTokenLogin: true,
+    idLang: 'global.navMenu.salesRep',
+  },
 ];
 
 export const getAllowedRoutesWithoutComponent = (globalState: GlobalState): BuyerPortalRoute[] => {

@@ -1,14 +1,17 @@
 import { useContext } from 'react';
-import { Box, ImageListItem } from '@mui/material';
+import { Box, ImageListItem, ListItem, Typography } from '@mui/material';
 
 import { STORE_DEFAULT_LOGO } from '@/constants';
 import { useMobile } from '@/hooks';
 import { GlobalContext } from '@/shared/global';
+import { useAppSelector } from '@/store';
 
 export default function B3Logo() {
   const {
     state: { logo },
   } = useContext(GlobalContext);
+  const customer = useAppSelector(({ company }) => company.customer);
+  const companyInfoName = useAppSelector(({ company }) => company.companyInfo.companyName);
 
   const [isMobile] = useMobile();
 
@@ -56,6 +59,12 @@ export default function B3Logo() {
       >
         <img src={logo || STORE_DEFAULT_LOGO} alt="logo" />
       </ImageListItem>
+      <ListItem sx={{ml: 12}}>
+        <Typography>{customer.companyRoleName}</Typography>
+      </ListItem>
+      <ListItem>
+        <Typography>{companyInfoName}</Typography>
+      </ListItem>
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import * as _ from 'lodash-es';
 
 export const convertObjectToGraphql = (data: CustomFieldItems) => {
   if (typeof data === 'string') {
@@ -91,7 +91,7 @@ export function convertObjectOrArrayKeysToSnake(input: ConvertibleTypes): Conver
     return input;
   }
   if (_.isArray(input)) {
-    return input.map((item) => convertObjectOrArrayKeysToSnake(item));
+    return input.map((item: any) => convertObjectOrArrayKeysToSnake(item));
   }
   if (_.isObject(input) && !_.isPlainObject(input)) {
     // Handle special cases like Date or RegExp objects
@@ -117,7 +117,7 @@ export function convertObjectOrArrayKeysToCamel(input: ConvertibleTypes): Conver
     return input;
   }
   if (_.isArray(input)) {
-    return input.map((item) => convertObjectOrArrayKeysToCamel(item));
+    return input.map((item: any) => convertObjectOrArrayKeysToCamel(item));
   }
   if (_.isObject(input) && !_.isPlainObject(input)) {
     // Handle special cases like Date or RegExp objects
