@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useB3Lang } from '@b3/lang';
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import trim from 'lodash-es/trim';
 
 import { B3CustomForm } from '@/components';
@@ -29,6 +29,8 @@ import { deCodeField, getAccountFormFields } from '../Registered/config';
 
 import { getAccountSettingsFields, getPasswordModifiedFields } from './config';
 import { b2bSubmitDataProcessing, bcSubmitDataProcessing, initB2BInfo, initBcInfo } from './utils';
+import B3Request from '@/shared/service/request/b3Fetch';
+import { RequestType } from '@/shared/service/request/base';
 
 function useData() {
   const isB2BUser = useAppSelector(isB2BUserSelector);
@@ -112,59 +114,43 @@ function AccountSetting() {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [accountSettings, setAccountSettings] = useState<any>({});
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [salesStaff, setSalesStaff] = useState<any[]>([]);
 
   useEffect(() => {
     const init = async () => {
       try {
         setLoading(true);
-
         const fn = isBCUser ? getBCAccountSettings : getB2BAccountSettings;
-
-        const params = isBCUser
-          ? {}
-          : {
-              companyId,
-            };
-
+        const params = isBCUser ? {} : { companyId };
         const key = isBCUser ? 'customerAccountSettings' : 'accountSettings';
-
         const accountFormAllFields = await getB2BAccountFormFields(isBCUser ? 1 : 2);
-        const accountFormFields = getAccountFormFields(
-          accountFormAllFields.accountFormFields || [],
-        );
-
+        const accountFormFields = getAccountFormFields(accountFormAllFields.accountFormFields || []);
         const contactInformation = (accountFormFields?.contactInformation || []).filter(
           (item: Partial<Fields>) => item.fieldId !== 'field_email_marketing_newsletter',
         );
-
         const { additionalInformation = [] } = accountFormFields;
-
         const { [key]: accountSettings } = await fn(params);
-
         const fields = isBCUser
           ? initBcInfo(accountSettings, contactInformation, additionalInformation)
-          : initB2BInfo(
-              accountSettings,
-              contactInformation,
-              getAccountSettingsFields(),
-              additionalInformation,
-            );
-
+          : initB2BInfo(accountSettings, contactInformation, getAccountSettingsFields(), additionalInformation);
         const passwordModifiedFields = getPasswordModifiedFields();
-
         const all = [...fields, ...passwordModifiedFields];
-
         const roleItem = all.find((item) => item.name === 'role');
-
         if (roleItem?.fieldType) roleItem.fieldType = 'text';
-
         setAccountInfoFormFields(all);
-
         setAccountSettings(accountSettings);
-
         setDecryptionFields(contactInformation);
-
         setExtraFields(additionalInformation);
+        // --- NEW: Fetch sales staff
+        const { data: salesList = [] } = await B3Request.get(`/api/v3/io/sales-staffs`, "B2BEditionRest", { companyId });
+        if (salesList.length > 0) {
+          const fullSalesData = await Promise.all(
+            salesList.map((staff: { id: number }) =>
+              B3Request.get(`/api/v3/io/sales-staffs/${staff.id}`, "B2BEditionRest"),
+            ),
+          );
+          setSalesStaff(fullSalesData.map((res) => res.data));
+        }
       } finally {
         if (isFinishUpdate) {
           snackbar.success(b3Lang('accountSettings.notification.detailsUpdated'));
@@ -288,51 +274,34 @@ function AccountSetting() {
 
   return (
     <B3Spin isSpinning={isLoading} background={backgroundColor}>
-      <Box
-        sx={{
-          width: isMobile ? '100%' : '35%',
-          minHeight: isMobile ? '800px' : '300px',
-          '& input, & .MuiFormControl-root .MuiTextField-root, & .MuiSelect-select.MuiSelect-filled, & .MuiTextField-root .MuiInputBase-multiline':
-            {
-              bgcolor: b3HexToRgb('#FFFFFF', 0.87),
-              borderRadius: '4px',
-              borderBottomLeftRadius: '0',
-              borderBottomRightRadius: '0',
-            },
-          '& .MuiButtonBase-root.MuiCheckbox-root:not(.Mui-checked), & .MuiRadio-root:not(.Mui-checked)':
-            {
-              color: b3HexToRgb(getContrastColor(backgroundColor), 0.6),
-            },
-          '& .MuiTypography-root.MuiTypography-body1.MuiFormControlLabel-label, & .MuiFormControl-root .MuiFormLabel-root:not(.Mui-focused)':
-            {
-              color: b3HexToRgb(getContrastColor(backgroundColor), 0.87),
-            },
-          '& .MuiInputLabel-root.MuiInputLabel-formControl:not(.Mui-focused)': {
-            color: b3HexToRgb(getContrastColor('#FFFFFF'), 0.6),
-          },
-        }}
-      >
-        <B3CustomForm
-          formFields={translatedFields}
-          errors={errors}
-          control={control}
-          getValues={getValues}
-          setValue={setValue}
-        />
-
-        <CustomButton
-          sx={{
-            mt: '28px',
-            mb: isMobile ? '20px' : '0',
-            width: '100%',
-            visibility: isVisible ? 'visible' : 'hidden',
-          }}
-          onClick={handleAddUserClick}
-          variant="contained"
-        >
-          {b3Lang('accountSettings.button.saveUpdates')}
-        </CustomButton>
-      </Box>
+      {isVisible && (
+        <Box mt={4}>
+          {salesStaff.length === 0 ? (
+            <CustomButton variant="outlined" fullWidth onClick={() => navigate('/quote')}>
+              Request Sales Assistance
+            </CustomButton>
+          ) : (
+            <Stack direction={'row'}>
+              {salesStaff.map((rep) => (
+                <Box
+                  key={rep.id}
+                  sx={{
+                    p: 2,
+                    m: 2,
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    backgroundColor: '#fff',
+                  }}
+                >
+                  <Box fontWeight="bold">{rep.name}</Box>
+                  <Box>Email: {rep.email}</Box>
+                  <Box>Phone: {rep.phoneNumber}</Box>
+                </Box>
+              ))}
+            </Stack>
+          )}
+        </Box>
+      )}
     </B3Spin>
   );
 }

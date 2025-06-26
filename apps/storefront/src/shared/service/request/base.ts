@@ -36,6 +36,7 @@ enum RequestType {
   BCGraphql = 'BCGraphql',
   BCProxyGraphql = 'BCProxyGraphql',
   B2BRest = 'B2BRest',
+  B2BEditionRest = 'B2BEditionRest',
   BCRest = 'BCRest',
   TranslationService = 'TranslationService',
 }

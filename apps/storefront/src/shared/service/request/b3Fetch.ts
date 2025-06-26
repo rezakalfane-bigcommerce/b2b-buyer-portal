@@ -17,8 +17,8 @@ const GraphqlEndpointsFn = (type: RequestTypeKeys): string => {
 };
 
 function request(path: string, config?: RequestInit, type?: RequestTypeKeys) {
-  const url = RequestType.B2BRest === type ? `${getAPIBaseURL()}${path}` : path;
-  const { B2BToken } = store.getState().company.tokens;
+  const url = ( RequestType.B2BRest === type || RequestType.B2BEditionRest === type ) ? `${getAPIBaseURL()}${path}` : path;
+  const B2BToken = RequestType.B2BEditionRest === type ? import.meta.env.VITE_B2B_API_TOKEN : store.getState().company.tokens.B2BToken
   const getToken: HeadersInit =
     type === RequestType.BCRest
       ? {
@@ -152,7 +152,7 @@ const B3Request = {
       return request(`${url}?${params}`, {
         method: 'GET',
         ...config,
-      });
+      }, type);
     }
     return request(
       url,

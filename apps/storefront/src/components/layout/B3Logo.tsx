@@ -12,6 +12,7 @@ export default function B3Logo() {
   } = useContext(GlobalContext);
   const customer = useAppSelector(({ company }) => company.customer);
   const companyInfoName = useAppSelector(({ company }) => company.companyInfo.companyName);
+  const companyInfoId = useAppSelector(({ company }) => company.companyInfo.id);
 
   const [isMobile] = useMobile();
 
@@ -59,11 +60,8 @@ export default function B3Logo() {
       >
         <img src={logo || STORE_DEFAULT_LOGO} alt="logo" />
       </ImageListItem>
-      <ListItem sx={{ml: 12}}>
-        <Typography>{customer.companyRoleName}</Typography>
-      </ListItem>
-      <ListItem>
-        <Typography>{companyInfoName}</Typography>
+      <ListItem sx={{minWidth: '300px', ml: 12}}>
+        <Typography>{customer.companyRoleName} - {companyInfoName} ({companyInfoId})</Typography>
       </ListItem>
     </Box>
   );
