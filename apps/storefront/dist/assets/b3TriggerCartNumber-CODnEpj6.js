@@ -1,2 +1,0 @@
-import{b1 as c,a5 as o,bR as m}from"./react-setup-CIpmLpp1.js";import{b as f}from"./base-BCVDEF8S.js";const n=["customItems","digitalItems","giftCertificates","physicalItems"],p=async()=>{let r=0;try{const t=await c();if(t.data.site.cart){const s=t.data.site.cart.lineItems;n.forEach(a=>{const e=s[a];e&&e.length>0&&(a==="giftCertificates"?r+=e.length:e.forEach(i=>{r+=Number(i.quantity)}))})}}catch(t){f.error(t)}o.dispatch(m(r))};export{p as b};
-//# sourceMappingURL=b3TriggerCartNumber-CODnEpj6.js.map
