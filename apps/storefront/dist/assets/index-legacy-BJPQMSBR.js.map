@@ -1,1 +1,0 @@
-{"version":3,"file":"index-legacy-BJPQMSBR.js","sources":["../../src/pages/CompanyOrder/index.tsx"],"sourcesContent":["import Order from '../order/Order';\n\nfunction CompanyOrder() {\n  return <Order isCompanyOrder />;\n}\n\nexport default CompanyOrder;\n"],"names":["jsx","Order","isCompanyOrder"],"mappings":"0jCAEA,WACS,OAAAA,EAAAA,IAACC,EAAM,CAAAC,gBAAc,GAC9B"}

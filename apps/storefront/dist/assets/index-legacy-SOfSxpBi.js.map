@@ -1,1 +1,0 @@
-{"version":3,"file":"index-legacy-SOfSxpBi.js","sources":["../../src/pages/MyOrder/index.tsx"],"sourcesContent":["import Order from '../order/Order';\n\nfunction MyOrder() {\n  return <Order />;\n}\n\nexport default MyOrder;\n"],"names":["Order"],"mappings":"0jCAEA,WACE,aAAQA,EAAM,GAChB"}
