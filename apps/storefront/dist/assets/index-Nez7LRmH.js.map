@@ -1,1 +1,0 @@
-{"version":3,"file":"index-Nez7LRmH.js","sources":["../../src/pages/CompanyOrder/index.tsx"],"sourcesContent":["import Order from '../order/Order';\n\nfunction CompanyOrder() {\n  return <Order isCompanyOrder />;\n}\n\nexport default CompanyOrder;\n"],"names":["CompanyOrder","jsx","Order"],"mappings":"m0BAEA,SAASA,GAAe,CACf,OAAAC,EAAA,IAACC,EAAM,CAAA,eAAc,EAAC,CAAA,CAC/B"}

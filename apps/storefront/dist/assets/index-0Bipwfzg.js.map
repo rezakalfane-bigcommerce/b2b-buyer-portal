@@ -1,0 +1,1 @@
+{"version":3,"file":"index-0Bipwfzg.js","sources":["../../src/pages/MyOrder/index.tsx"],"sourcesContent":["import Order from '../order/Order';\n\nfunction MyOrder() {\n  return <Order />;\n}\n\nexport default MyOrder;\n"],"names":["MyOrder","Order"],"mappings":"m0BAEA,SAASA,GAAU,CACjB,aAAQC,EAAM,EAAA,CAChB"}
