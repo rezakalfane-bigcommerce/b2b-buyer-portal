@@ -515,7 +515,7 @@ function ShoppingDetailFooter(props: ShoppingDetailFooterProps) {
     <Grid
       sx={{
         position: 'fixed',
-        bottom: isMobile && isAgenting ? '52px' : 0,
+        bottom: isMobile && isAgenting ? '52px' : 52,
         left: 0,
         backgroundColor: '#fff',
         width: '100%',
